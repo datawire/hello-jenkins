@@ -1,0 +1,46 @@
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+ext {
+  // Quark dependencies should be specified as below. The $group, $name, and $version are the values used to
+  // resolve from Maven. The $src is the URL or file path to a Quark source file.
+  quarkDependencies = [
+      [
+          group   : 'datawire_mdk',
+          name    : 'datawire_mdk',
+          version : '2.0.0',
+          src     : 'https://raw.githubusercontent.com/datawire/mdk/master/quark/mdk-2.0.q'
+      ],
+  ]
+}
+
+dependencies {
+  compile group: "ch.qos.logback", name: "logback-classic", version: parent.ext.logbackVersion
+
+  compile group: "io.vertx", name: "vertx-auth-jwt", version: parent.ext.vertxVersion
+  compile group: "io.vertx", name: "vertx-core",     version: parent.ext.vertxVersion
+  compile group: "io.vertx", name: "vertx-web",      version: parent.ext.vertxVersion
+  
+  testCompile group: "io.vertx", name: "vertx-unit", version: parent.ext.vertxVersion
+}
+
+mainClassName = 'io.vertx.core.Launcher'
+
+applicationDistribution.from(parent.projectDir) {
+  include 'LICENSE'
+  include 'NOTICE'
+  include 'README.md'
+  into ''
+}
+
+shadowJar {
+  classifier = 'fat'
+  
+  manifest {
+    attributes 'Main-Verticle': "${group}.ServiceVerticle"
+  }
+  
+  mergeServiceFiles {
+    include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
+  }
+}

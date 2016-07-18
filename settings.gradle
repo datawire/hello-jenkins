@@ -1,0 +1,6 @@
+rootProject.name = 'hello-jenkins'
+
+include("${rootProject.name}-web")
+project(":${rootProject.name}-web").name = "${rootProject.name}-web"
+
+
